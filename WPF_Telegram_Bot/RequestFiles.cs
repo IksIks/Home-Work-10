@@ -3,7 +3,8 @@ using System.IO;
 using System.Linq;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace TelegramBot
+
+namespace WPF_Telegram_Bot
 {
     class RequestFiles
     {
@@ -11,12 +12,12 @@ namespace TelegramBot
         public static List<FileInfo> FileListName { get; private set; }
         public static async void ProcessRequestFiles(string fileType, string firstName)
         {
-            DirectoryInfo files = new DirectoryInfo(Program.Path + $@"\{firstName}\{fileType}\");
+            DirectoryInfo files = new DirectoryInfo(MainWindow.Path + $@"\{firstName}\{fileType}\");
             
             FileListName = files.GetFiles().ToList();
             if (FileListName.Count == 0)
             {
-                await Program.bot.SendTextMessageAsync(Program.Message.Chat.Id, "Нет сохраненных файлов, отправьте мне что-нибудь для начала");
+                await MainWindow.bot.SendTextMessageAsync(MainWindow.Messages.Chat.Id, "Нет сохраненных файлов, отправьте мне что-нибудь для начала");
                 return;
             }
             List<List<InlineKeyboardButton>> fileButtons = new List<List<InlineKeyboardButton>>();
@@ -32,7 +33,7 @@ namespace TelegramBot
                 fileButtons.Add(buttonArray);
             }
             InlineKeyboardMarkup InlineKeyboardMarkup = new InlineKeyboardMarkup(fileButtons);
-            await Program.bot.SendTextMessageAsync(Program.Message.Chat.Id, $"Список файлов", replyMarkup: InlineKeyboardMarkup);
+            await MainWindow.bot.SendTextMessageAsync(MainWindow.Messages.Chat.Id, $"Список файлов", replyMarkup: InlineKeyboardMarkup);
 
         }
     }

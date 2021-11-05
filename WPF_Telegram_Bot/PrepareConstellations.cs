@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace TelegramBot
+namespace WPF_Telegram_Bot
 {
     class PrepareConstellations
     {
@@ -34,7 +34,7 @@ namespace TelegramBot
             if (answerSerchLetter == null)
             {
                 string text = $"Используй специальную клавиатуру, на букву '{letter}' нет созвездий";
-                await Program.bot.SendTextMessageAsync(Program.Message.Chat.Id, text);
+                await MainWindow.bot.SendTextMessageAsync(MainWindow.Messages.Chat.Id, text);
             }
             else
             {
@@ -51,7 +51,7 @@ namespace TelegramBot
                     constellationsButtons.Add(buttonArray);
                 }
                 InlineKeyboardMarkup markup = new InlineKeyboardMarkup(constellationsButtons);
-                await Program.bot.SendTextMessageAsync(Program.Message.Chat.Id, $"Созвездия на букву '{letter}'", replyMarkup: markup);
+                await MainWindow.bot.SendTextMessageAsync(MainWindow.Messages.Chat.Id, $"Созвездия на букву '{letter}'", replyMarkup: markup);
             }
         }
     }

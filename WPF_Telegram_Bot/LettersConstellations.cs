@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace TelegramBot
+namespace WPF_Telegram_Bot
 {
     class LettersConstellations
     {

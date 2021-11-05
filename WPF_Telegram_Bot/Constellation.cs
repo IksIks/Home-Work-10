@@ -1,4 +1,4 @@
-﻿namespace TelegramBot
+﻿namespace WPF_Telegram_Bot
 {
     public class Constellation
     {
