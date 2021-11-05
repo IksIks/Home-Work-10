@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+
 namespace WPF_Telegram_Bot
 {
     /// <summary>
@@ -22,41 +23,34 @@ namespace WPF_Telegram_Bot
     {
         public MainWindow()
         {
-
-
             InitializeComponent();
-            int[] a = new int[100];
-            Random q = new Random(200000000);
-            for (int i = 0; i < a.Length; i++)
-            {
-                a[i] = q.Next();
-            }
-            Test.ItemsSource = a;
+            
         }
 
         private void BtnClick(object sender, RoutedEventArgs e)
         {
+
             
-            switch (((Button)sender).Content)
-            {
-                case "Документы":
-                    {
-                        break;
-                    }
-                case "Аудио":
-                    {
-                        break;
-                    }
-                case "Фото":
-                    {
-                        break;
-                    }
-                case "Видео":
-                    {
-                        break;
-                    }
-            }
-        
+            //switch (((Button)sender).Name)
+            //{
+            //    case "Document":
+            //        {
+            //            break;
+            //        }
+            //    case "Audio":
+            //        {
+            //            break;
+            //        }
+            //    case "Photo":
+            //        {
+            //            break;
+            //        }
+            //    case "Video":
+            //        {
+            //            break;
+            //        }
+            //}
+
         }
     }
 }
