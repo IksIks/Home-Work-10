@@ -17,7 +17,7 @@ namespace WPF_Telegram_Bot
             FileListName = files.GetFiles().ToList();
             if (FileListName.Count == 0)
             {
-                await MainWindow.bot.SendTextMessageAsync(MainWindow.Messages.Chat.Id, "Нет сохраненных файлов, отправьте мне что-нибудь для начала");
+                await MainWindow.bot.SendTextMessageAsync(MainWindow.Message.Chat.Id, "Нет сохраненных файлов, отправьте мне что-нибудь для начала");
                 return;
             }
             List<List<InlineKeyboardButton>> fileButtons = new List<List<InlineKeyboardButton>>();
@@ -33,7 +33,7 @@ namespace WPF_Telegram_Bot
                 fileButtons.Add(buttonArray);
             }
             InlineKeyboardMarkup InlineKeyboardMarkup = new InlineKeyboardMarkup(fileButtons);
-            await MainWindow.bot.SendTextMessageAsync(MainWindow.Messages.Chat.Id, $"Список файлов", replyMarkup: InlineKeyboardMarkup);
+            await MainWindow.bot.SendTextMessageAsync(MainWindow.Message.Chat.Id, $"Список файлов", replyMarkup: InlineKeyboardMarkup);
 
         }
     }

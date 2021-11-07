@@ -34,7 +34,7 @@ namespace WPF_Telegram_Bot
             if (answerSerchLetter == null)
             {
                 string text = $"Используй специальную клавиатуру, на букву '{letter}' нет созвездий";
-                await MainWindow.bot.SendTextMessageAsync(MainWindow.Messages.Chat.Id, text);
+                await MainWindow.bot.SendTextMessageAsync(MainWindow.Message.Chat.Id, text);
             }
             else
             {
@@ -51,7 +51,7 @@ namespace WPF_Telegram_Bot
                     constellationsButtons.Add(buttonArray);
                 }
                 InlineKeyboardMarkup markup = new InlineKeyboardMarkup(constellationsButtons);
-                await MainWindow.bot.SendTextMessageAsync(MainWindow.Messages.Chat.Id, $"Созвездия на букву '{letter}'", replyMarkup: markup);
+                await MainWindow.bot.SendTextMessageAsync(MainWindow.Message.Chat.Id, $"Созвездия на букву '{letter}'", replyMarkup: markup);
             }
         }
     }
