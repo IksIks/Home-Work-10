@@ -7,21 +7,25 @@ using System.Collections.ObjectModel;
 
 namespace WPF_Telegram_Bot
 {
-    public class User
+    public class UserLog
     {
         public long Id { get; set; }
         public string Name { get; set; }
-        public ObservableCollection<string> UserMessages { get; set; }
+        public string MessageText { get; set; }
 
-        public User()
+
+        public UserLog()
         { }
-       public User(long id, string name, ObservableCollection<string> userMessages)
+       public UserLog(long id, string name, string messageText)
         {
             Id = id;
             Name = name;
-            UserMessages = userMessages;
+            MessageText = messageText;
         }
 
-
+        public override string ToString()
+        {
+            return $"Id {Id}, Пользователь {Name}, Текст {MessageText}";
+        }
     }
 }

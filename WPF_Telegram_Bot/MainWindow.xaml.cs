@@ -46,6 +46,7 @@ namespace WPF_Telegram_Bot
         private static MainWindow window;
         // свойство для записи вводимого администратором текста для отправки его выбранному пользователю
         public string TextToUser { get; set; }
+        public static ObservableCollection<UserLog> UsersBotLogs = new ObservableCollection<UserLog>();
         #endregion
 
 
@@ -130,6 +131,7 @@ namespace WPF_Telegram_Bot
         public MainWindow()
         {
             InitializeComponent();
+            
             window = this;
             string tokenBot = System.IO.File.ReadAllText(@"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\Token_BOT.txt");
             string dFlowKeyPath = @"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\WPF_Telegram_Bot\iksbot-9tan-8bfc6cdbd2be.json";
@@ -179,7 +181,8 @@ namespace WPF_Telegram_Bot
             bot.StartReceiving();
             var iAm = bot.GetMeAsync().Result;
             listBoxData.Add((iAm.FirstName).ToString());
-            CMD.ItemsSource = listBoxData;
+            
+            CMD.ItemsSource = UsersBotLogs;
 
             //Console.ReadLine();
             
@@ -228,6 +231,8 @@ namespace WPF_Telegram_Bot
                                 await bot.SendPhotoAsync(Message.From.Id, item.UrlMap);
                                 await bot.SendPhotoAsync(Message.From.Id, item.UrlPhoto);
                                 await bot.SendTextMessageAsync(Message.From.Id, item.Text);
+                                DataToMainWindow($"Созвездие {item.Name}");
+                                //UsersBotLogs.Add(new UserLog(Message.Chat.Id, firstName, $"Созвездие {item.Name}"));
                             }
                         }
                     }
@@ -239,17 +244,18 @@ namespace WPF_Telegram_Bot
         [Obsolete]
         private static async void BotOnMessage(object sender, MessageEventArgs e)
         {
-            
             Message = e.Message;
+            firstName = Message.From.FirstName;
+            //UsersBotLogs.Add(new UserLog(Message.Chat.Id, firstName, Message.Text));
             string answerText = default;
             // передача в основной поток, как работает не знаю, смотрите ДЗ 10.4 на 7 минуте, там ничего не сказано 
             window.Dispatcher.Invoke(() =>
             {
-                listBoxData.Add($"Сообщение от {Message.From.FirstName}, текст: {Message.Text}");
+                //listBoxData.Add($"Сообщение от {firstName}, текст: {Message.Text}");
+                UsersBotLogs.Add(new UserLog(Message.Chat.Id, firstName, Message.Text));
             });
 
 
-            firstName = Message.From.FirstName;
             //создается папка пользователя с подпапками
             if (!Directory.Exists(Path + $@"\{firstName}"))
             {
@@ -429,15 +435,15 @@ namespace WPF_Telegram_Bot
 
         }
 
-        private void SendMsg_Click(object sender, RoutedEventArgs e)
+        async private void SendMsg_Click(object sender, RoutedEventArgs e)
         {
-            if (String.IsNullOrEmpty(Messages.Text))
+            if (String.IsNullOrEmpty(TextToUser))
             {
                 Messages.Text = "Сообщение пользователю";
                 return;
             }
-            listBoxData.Add(TextToUser);
-            CMD.ItemsSource = listBoxData;
+            await bot.SendTextMessageAsync(Message.From.Id, TextToUser);
+            SendText(TextToUser);
             TextToUser = default;
             Messages.Text = "Сообщение пользователю";
         }
@@ -450,6 +456,29 @@ namespace WPF_Telegram_Bot
         private void Messages_MouseEnter(object sender, MouseEventArgs e)
         {
             Messages.Clear();
+        }
+        /// <summary>
+        /// отправка данных в MainWindow через Диспетчер из другого потока
+        /// </summary>
+        /// <param name="messageText">текст принятый от пользователя</param>
+        private static void DataToMainWindow(string messageText)
+        {
+
+            window.Dispatcher.Invoke(() =>
+            {
+                //listBoxData.Add($"Сообщение от {firstName}, текст: {Message.Text}");
+                UsersBotLogs.Add(new UserLog(Message.Chat.Id, firstName, messageText));
+            });
+        }
+        /// <summary>
+        /// возможность логов в поле ListBox (x:Name="CMD") из обработчиков или окна MainWindow
+        /// </summary>
+        /// <param name="messageText">передаваемый текст</param>
+        /// <returns></returns>
+        private void SendText(string messageText)
+        {
+            UsersBotLogs.Add(new UserLog(Message.Chat.Id, firstName, messageText));
+            CMD.ItemsSource = UsersBotLogs;
         }
     }
 }
