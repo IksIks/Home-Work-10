@@ -25,7 +25,7 @@ using Telegram.Bot.Args;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using System.Collections.ObjectModel;
-using System.Threading;
+
 
 namespace WPF_Telegram_Bot
 {
@@ -34,7 +34,7 @@ namespace WPF_Telegram_Bot
 
     public partial class MainWindow : Window
     {
-
+        #region Поля и свойства класса
         public static TelegramBotClient bot;
         private static string firstName = default;
         private static SessionsClient dFlowClient;
@@ -44,6 +44,10 @@ namespace WPF_Telegram_Bot
         public static ObservableCollection<string> listBoxData = new ObservableCollection<string>();
         //переменная для возможности передачи в основной поток
         private static MainWindow window;
+        // свойство для записи вводимого администратором текста для отправки его выбранному пользователю
+        public string TextToUser { get; set; }
+        #endregion
+
 
         public static Telegram.Bot.Types.Message Message { get; set; }
         //Начальный путь к файлу
@@ -423,6 +427,29 @@ namespace WPF_Telegram_Bot
                     }
             }
 
+        }
+
+        private void SendMsg_Click(object sender, RoutedEventArgs e)
+        {
+            if (String.IsNullOrEmpty(Messages.Text))
+            {
+                Messages.Text = "Сообщение пользователю";
+                return;
+            }
+            listBoxData.Add(TextToUser);
+            CMD.ItemsSource = listBoxData;
+            TextToUser = default;
+            Messages.Text = "Сообщение пользователю";
+        }
+
+        private void Messages_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextToUser = Messages.Text;
+        }
+
+        private void Messages_MouseEnter(object sender, MouseEventArgs e)
+        {
+            Messages.Clear();
         }
     }
 }
