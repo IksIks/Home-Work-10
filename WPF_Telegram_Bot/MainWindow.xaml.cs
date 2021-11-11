@@ -25,7 +25,7 @@ using Telegram.Bot.Args;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using System.Collections.ObjectModel;
-
+using System.Diagnostics;
 
 namespace WPF_Telegram_Bot
 {
@@ -232,7 +232,6 @@ namespace WPF_Telegram_Bot
                                 await bot.SendPhotoAsync(Message.From.Id, item.UrlPhoto);
                                 await bot.SendTextMessageAsync(Message.From.Id, item.Text);
                                 DataToMainWindow($"Созвездие {item.Name}");
-                                //UsersBotLogs.Add(new UserLog(Message.Chat.Id, firstName, $"Созвездие {item.Name}"));
                             }
                         }
                     }
@@ -416,19 +415,22 @@ namespace WPF_Telegram_Bot
             {
                 case "Document":
                     {
-                        
+                        Process.Start(Path + $@"\{firstName}\Document");
                         break;
                     }
                 case "Audio":
                     {
+                        Process.Start(Path + $@"\{firstName}\Audio");
                         break;
                     }
                 case "Photo":
                     {
+                        Process.Start(Path + $@"\{firstName}\Photo");
                         break;
                     }
                 case "Video":
                     {
+                        Process.Start(Path + $@"\{firstName}\Video");
                         break;
                     }
             }
@@ -466,12 +468,11 @@ namespace WPF_Telegram_Bot
 
             window.Dispatcher.Invoke(() =>
             {
-                //listBoxData.Add($"Сообщение от {firstName}, текст: {Message.Text}");
                 UsersBotLogs.Add(new UserLog(Message.Chat.Id, firstName, messageText));
             });
         }
         /// <summary>
-        /// возможность логов в поле ListBox (x:Name="CMD") из обработчиков или окна MainWindow
+        /// возможность отправки логов в поле ListBox (x:Name="CMD") из обработчиков или окна MainWindow
         /// </summary>
         /// <param name="messageText">передаваемый текст</param>
         /// <returns></returns>

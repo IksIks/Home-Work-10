@@ -25,7 +25,7 @@ namespace WPF_Telegram_Bot
 
         public override string ToString()
         {
-            return $"Id {Id}, Пользователь {Name}, Текст {MessageText}";
+            return $"Id {Id}, {Name}, Текст: {MessageText}";
         }
     }
 }
