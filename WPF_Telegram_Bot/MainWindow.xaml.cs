@@ -41,16 +41,22 @@ namespace WPF_Telegram_Bot
         private static string projectID;
         private static string sessionID;
         private static string path;
-        public static ObservableCollection<string> listBoxData = new ObservableCollection<string>();
+        public static long Id { get; set; }
+
+        public static ObservableCollection<UserLog> ListBoxUsers { get; set; }
+
         //переменная для возможности передачи в основной поток
         private static MainWindow window;
+
         // свойство для записи вводимого администратором текста для отправки его выбранному пользователю
         public string TextToUser { get; set; }
-        public static ObservableCollection<UserLog> UsersBotLogs = new ObservableCollection<UserLog>();
+
+        // свойство для записи логов всех подключаемых пользователей
+        public static ObservableCollection<UserLog> UsersBotLogs { get; set; }
+        public static Telegram.Bot.Types.Message Message { get; set; }
         #endregion
 
 
-        public static Telegram.Bot.Types.Message Message { get; set; }
         //Начальный путь к файлу
         public static string Path
         {
@@ -180,9 +186,10 @@ namespace WPF_Telegram_Bot
             bot.OnCallbackQuery += BotOnCallbackQuery;
             bot.StartReceiving();
             var iAm = bot.GetMeAsync().Result;
-            listBoxData.Add((iAm.FirstName).ToString());
-            
+            ListBoxUsers = new ObservableCollection<UserLog>();
+            UsersBotLogs = new ObservableCollection<UserLog>();
             CMD.ItemsSource = UsersBotLogs;
+            UsersList.ItemsSource = ListBoxUsers;
 
             //Console.ReadLine();
             
@@ -231,7 +238,7 @@ namespace WPF_Telegram_Bot
                                 await bot.SendPhotoAsync(Message.From.Id, item.UrlMap);
                                 await bot.SendPhotoAsync(Message.From.Id, item.UrlPhoto);
                                 await bot.SendTextMessageAsync(Message.From.Id, item.Text);
-                                DataToMainWindow($"Созвездие {item.Name}");
+                                DataToMainWindow(UsersBotLogs, $"Созвездие {item.Name}");
                             }
                         }
                     }
@@ -245,6 +252,7 @@ namespace WPF_Telegram_Bot
         {
             Message = e.Message;
             firstName = Message.From.FirstName;
+            
             //UsersBotLogs.Add(new UserLog(Message.Chat.Id, firstName, Message.Text));
             string answerText = default;
             // передача в основной поток, как работает не знаю, смотрите ДЗ 10.4 на 7 минуте, там ничего не сказано 
@@ -256,14 +264,21 @@ namespace WPF_Telegram_Bot
 
 
             //создается папка пользователя с подпапками
-            if (!Directory.Exists(Path + $@"\{firstName}"))
+            if (!Directory.Exists(Path + $@"\{firstName}_{Message.Chat.Id}"))
             {
-                Directory.CreateDirectory(Path + $@"\{firstName}");
-                Directory.CreateDirectory(Path + $@"\{firstName}\Video");
-                Directory.CreateDirectory(Path + $@"\{firstName}\Audio");
-                Directory.CreateDirectory(Path + $@"\{firstName}\Photo");
-                Directory.CreateDirectory(Path + $@"\{firstName}\Document");
+                Directory.CreateDirectory(Path + $@"\{firstName}_{Message.Chat.Id}");
+                Directory.CreateDirectory(Path + $@"\{firstName}_{Message.Chat.Id}\Video");
+                Directory.CreateDirectory(Path + $@"\{firstName}_{Message.Chat.Id}\Audio");
+                Directory.CreateDirectory(Path + $@"\{firstName}_{Message.Chat.Id}\Photo");
+                Directory.CreateDirectory(Path + $@"\{firstName}_{Message.Chat.Id}\Document");
             }
+            
+            if (!ListBoxUsers.Contains(new UserLog(Message.Chat.Id, firstName)))
+            {
+                //ListBoxUsers.Add(new UserLog(Message.Chat.Id, firstName));
+                DataToMainWindow(ListBoxUsers, ""); ; ; ; ;
+            }
+
             //условие при котором формируются Inline кнопки созвездий согласно буквы
             if (Message.Type == MessageType.Text && Message.Text.Length == 1)
             {
@@ -415,22 +430,22 @@ namespace WPF_Telegram_Bot
             {
                 case "Document":
                     {
-                        Process.Start(Path + $@"\{firstName}\Document");
+                        Process.Start(Path + $@"\{firstName}_{Message.Chat.Id}\Document");
                         break;
                     }
                 case "Audio":
                     {
-                        Process.Start(Path + $@"\{firstName}\Audio");
+                        Process.Start(Path + $@"\{firstName}_{Message.Chat.Id}\Audio");
                         break;
                     }
                 case "Photo":
                     {
-                        Process.Start(Path + $@"\{firstName}\Photo");
+                        Process.Start(Path + $@"\{firstName}_{Message.Chat.Id}\Photo");
                         break;
                     }
                 case "Video":
                     {
-                        Process.Start(Path + $@"\{firstName}\Video");
+                        Process.Start(Path + $@"\{firstName}_{Message.Chat.Id}\Video");
                         break;
                     }
             }
@@ -459,16 +474,17 @@ namespace WPF_Telegram_Bot
         {
             Messages.Clear();
         }
+
         /// <summary>
         /// отправка данных в MainWindow через Диспетчер из другого потока
         /// </summary>
         /// <param name="messageText">текст принятый от пользователя</param>
-        private static void DataToMainWindow(string messageText)
+        private static void DataToMainWindow(ObservableCollection<UserLog> collection, string messageText)
         {
 
             window.Dispatcher.Invoke(() =>
             {
-                UsersBotLogs.Add(new UserLog(Message.Chat.Id, firstName, messageText));
+                collection.Add(new UserLog(Message.Chat.Id, firstName, messageText));
             });
         }
         /// <summary>

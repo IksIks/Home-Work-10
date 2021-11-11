@@ -13,7 +13,7 @@
         </Grid.ColumnDefinitions>
         <StackPanel>
             <ScrollViewer Margin="15" Height="300">
-                <ListBox x:Name="Test" Background="Black" Foreground="White"/>
+                <ListBox x:Name="UsersList" Background="Black" Foreground="White"/>
             </ScrollViewer>
             <Button x:Name="Document" Click="BtnClick" Content="Документы" Height="50" Width="100" Margin="25,0,0,5" HorizontalAlignment="Left"/>
             <Button x:Name="Audio" Click="BtnClick" Content="Аудио" Height="50" Width="100" Margin="25,0,0,5" HorizontalAlignment="Left"/>
