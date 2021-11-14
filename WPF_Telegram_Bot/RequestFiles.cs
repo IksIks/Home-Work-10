@@ -12,7 +12,7 @@ namespace WPF_Telegram_Bot
         public static List<FileInfo> FileListName { get; private set; }
         public static async void ProcessRequestFiles(string fileType, string firstName)
         {
-            DirectoryInfo files = new DirectoryInfo(MainWindow.Path + $@"\{firstName}\{fileType}\");
+            DirectoryInfo files = new DirectoryInfo(MainWindow.Path + $@"\{firstName}_{MainWindow.Message.Chat.Id}\{fileType}\");
             
             FileListName = files.GetFiles().ToList();
             if (FileListName.Count == 0)

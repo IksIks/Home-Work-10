@@ -252,7 +252,7 @@ namespace WPF_Telegram_Bot
         {
             Message = e.Message;
             firstName = Message.From.FirstName;
-            
+            UserLog tempUser = new UserLog(Message.Chat.Id, firstName);
             //UsersBotLogs.Add(new UserLog(Message.Chat.Id, firstName, Message.Text));
             string answerText = default;
             // передача в основной поток, как работает не знаю, смотрите ДЗ 10.4 на 7 минуте, там ничего не сказано 
@@ -272,13 +272,15 @@ namespace WPF_Telegram_Bot
                 Directory.CreateDirectory(Path + $@"\{firstName}_{Message.Chat.Id}\Photo");
                 Directory.CreateDirectory(Path + $@"\{firstName}_{Message.Chat.Id}\Document");
             }
-            
-            if (!ListBoxUsers.Contains(new UserLog(Message.Chat.Id, firstName)))
-            {
-                //ListBoxUsers.Add(new UserLog(Message.Chat.Id, firstName));
-                DataToMainWindow(ListBoxUsers, ""); ; ; ; ;
-            }
 
+            
+            if(ListBoxUsers.All(user => user.Id != tempUser.Id))
+            {
+                window.Dispatcher.Invoke(() =>
+                {
+                    ListBoxUsers.Add(new UserLog(Message.Chat.Id, firstName));
+                });
+            }
             //условие при котором формируются Inline кнопки созвездий согласно буквы
             if (Message.Type == MessageType.Text && Message.Text.Length == 1)
             {
