@@ -209,7 +209,7 @@ namespace WPF_Telegram_Bot
                 string type = a[0];
                 string fileName = RequestFiles.FileListName[indexFileName].ToString();
 
-                SendFiles(Path + $@"\{Message.From.FirstName}\{type}\{fileName}", $"{fileName}", type);
+                SendFiles(Path + $@"\{Message.From.FirstName}_{Message.Chat.Id}\{type}\{fileName}", $"{fileName}", type);
                 return;
             }
             //во второе условие приходят данные для дальнейшего поиска нужных типов сохраненных файлов
@@ -402,24 +402,28 @@ namespace WPF_Telegram_Bot
             switch (Message.Type)
             {
                 case MessageType.Photo:
-                    Console.WriteLine("Получено фото ");
+                    //Console.WriteLine("Получено фото ");
+                    DataToMainWindow(UsersBotLogs, "Получено фото ");
                     string photoFileId = Message.Photo[Message.Photo.Length - 1].FileId;
-                    Download(photoFileId, Path + $@"\{firstName}\Photo\" + (Message.Photo[Message.Photo.Length - 1]).FileUniqueId + ".jpg");
+                    Download(photoFileId, Path + $@"\{firstName}_{Message.Chat.Id}\Photo\" + (Message.Photo[Message.Photo.Length - 1]).FileUniqueId + ".jpg");
                     await bot.SendTextMessageAsync(Message.From.Id, "я сохранил это");
                     break;
                 case MessageType.Document:
-                    Console.WriteLine("Получен документ " + Message.Document.FileName);
-                    Download(e.Message.Document.FileId, Path + $@"\{firstName}\Document\" + Message.Document.FileName);
+                    //Console.WriteLine("Получен документ " + Message.Document.FileName);
+                    DataToMainWindow(UsersBotLogs, "Получен документ " + Message.Document.FileName);
+                   Download(e.Message.Document.FileId, Path + $@"\{firstName}_{Message.Chat.Id}\Document\" + Message.Document.FileName);
                     await bot.SendTextMessageAsync(Message.From.Id, "я сохранил это");
                     break;
                 case MessageType.Video:
-                    Console.WriteLine("Получен видео файл " + Message.Video.FileName);
-                    Download(Message.Video.FileId, Path + $@"\{firstName}\Video\" + Message.Video.FileName);
+                    //Console.WriteLine("Получен видео файл " + Message.Video.FileName);
+                    DataToMainWindow(UsersBotLogs, "Получен видео файл " + Message.Video.FileName);
+                    Download(Message.Video.FileId, Path + $@"\{firstName}_{Message.Chat.Id}\Video\" + Message.Video.FileName);
                     await bot.SendTextMessageAsync(Message.From.Id, "я сохранил это");
                     break;
                 case MessageType.Audio:
-                    Console.WriteLine("Получен аудио файл " + Message.Audio.FileName);
-                    Download(Message.Audio.FileId, Path + $@"\{firstName}\Audio\" + Message.Audio.FileName);
+                    //Console.WriteLine("Получен аудио файл " + Message.Audio.FileName);
+                    DataToMainWindow(UsersBotLogs, "Получен аудио файл " + Message.Audio.FileName);
+                    Download(Message.Audio.FileId, Path + $@"\{firstName}_{Message.Chat.Id}\Audio\" + Message.Audio.FileName);
                     await bot.SendTextMessageAsync(Message.From.Id, "я сохранил это");
                     break;
             }
