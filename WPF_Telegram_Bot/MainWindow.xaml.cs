@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+//using System.Text;
+//using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
+//using System.Windows.Data;
+//using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+//using System.Windows.Media;
+//using System.Windows.Media.Imaging;
+//using System.Windows.Navigation;
+//using System.Windows.Shapes;
 using Google.Cloud.Dialogflow.V2;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -29,9 +29,6 @@ using System.Diagnostics;
 
 namespace WPF_Telegram_Bot
 {
-    
-
-
     public partial class MainWindow : Window
     {
         #region Поля и свойства класса
@@ -78,7 +75,6 @@ namespace WPF_Telegram_Bot
                 {
                     await bot.DownloadFileAsync(file.FilePath, stream);
                 }
-
             }
             catch (Exception)
             {
@@ -139,8 +135,10 @@ namespace WPF_Telegram_Bot
             InitializeComponent();
             
             window = this;
-            string tokenBot = System.IO.File.ReadAllText(@"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\Token_BOT.txt");
-            string dFlowKeyPath = @"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\WPF_Telegram_Bot\iksbot-9tan-8bfc6cdbd2be.json";
+            //string tokenBot = System.IO.File.ReadAllText(@"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\Token_BOT.txt");
+            //string dFlowKeyPath = @"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\WPF_Telegram_Bot\iksbot-9tan-8bfc6cdbd2be.json";
+            string tokenBot = System.IO.File.ReadAllText(@"D:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\Token_BOT.txt");
+            string dFlowKeyPath = @"D:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\WPF_Telegram_Bot\iksbot-9tan-8bfc6cdbd2be.json";
 
             if (!Directory.Exists(Path))
                 Directory.CreateDirectory(Path);
@@ -210,14 +208,20 @@ namespace WPF_Telegram_Bot
                 string fileName = RequestFiles.FileListName[indexFileName].ToString();
 
                 SendFiles(Path + $@"\{Message.From.FirstName}_{Message.Chat.Id}\{type}\{fileName}", $"{fileName}", type);
+                DataToMainWindow(UsersBotLogs, $"Отправлен файл {fileName}");
                 return;
             }
             //во второе условие приходят данные для дальнейшего поиска нужных типов сохраненных файлов
             if (response == MessageType.Document.ToString() || response == MessageType.Video.ToString() ||
                 response == MessageType.Photo.ToString() || response == MessageType.Audio.ToString())
                 try
-                { RequestFiles.ProcessRequestFiles(response, Message.From.FirstName); }
-                catch { Console.WriteLine("Ошибка"); }
+                {
+                    RequestFiles.ProcessRequestFiles(response, Message.From.FirstName);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
             //ответ пользователю по запросу о созвездиях
             else
             {
@@ -273,7 +277,6 @@ namespace WPF_Telegram_Bot
                 Directory.CreateDirectory(Path + $@"\{firstName}_{Message.Chat.Id}\Document");
             }
 
-            
             if(ListBoxUsers.All(user => user.Id != tempUser.Id))
             {
                 window.Dispatcher.Invoke(() =>
@@ -494,7 +497,7 @@ namespace WPF_Telegram_Bot
             });
         }
         /// <summary>
-        /// возможность отправки логов в поле ListBox (x:Name="CMD") из обработчиков или окна MainWindow
+        /// возможность отправки логов в поле ListBox (x:Name="CMD") из обработчиков окна MainWindow.xaml
         /// </summary>
         /// <param name="messageText">передаваемый текст</param>
         /// <returns></returns>
