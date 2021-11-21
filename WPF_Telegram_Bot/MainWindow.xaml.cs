@@ -15,10 +15,10 @@ using System.Windows.Input;
 using Google.Cloud.Dialogflow.V2;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
+//using System;
+//using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+//using System.Linq;
 using System.Net;
 using Telegram.Bot;
 using Telegram.Bot.Args;
@@ -38,9 +38,9 @@ namespace WPF_Telegram_Bot
         private static string projectID;
         private static string sessionID;
         private static string path;
-        public static long Id { get; set; }
 
-        public static ObservableCollection<UserLog> ListBoxUsers { get; set; }
+        // свойство для передачи в ListBox "UserList"
+        public static ObservableCollection<UserLog> ListBoxUserList { get; set; }
 
         //переменная для возможности передачи в основной поток
         private static MainWindow window;
@@ -48,8 +48,8 @@ namespace WPF_Telegram_Bot
         // свойство для записи вводимого администратором текста для отправки его выбранному пользователю
         public string TextToUser { get; set; }
 
-        // свойство для записи логов всех подключаемых пользователей
-        public static ObservableCollection<UserLog> UsersBotLogs { get; set; }
+        // свойство для записи логов всех подключаемых пользователей и передачи в ListBox "CMD"
+        public static ObservableCollection<UserLog> ListBoxUsersBotLogsCmd { get; set; }
         public static Telegram.Bot.Types.Message Message { get; set; }
         #endregion
 
@@ -135,10 +135,10 @@ namespace WPF_Telegram_Bot
             InitializeComponent();
             
             window = this;
-            //string tokenBot = System.IO.File.ReadAllText(@"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\Token_BOT.txt");
-            //string dFlowKeyPath = @"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\WPF_Telegram_Bot\iksbot-9tan-8bfc6cdbd2be.json";
-            string tokenBot = System.IO.File.ReadAllText(@"D:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\Token_BOT.txt");
-            string dFlowKeyPath = @"D:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\WPF_Telegram_Bot\iksbot-9tan-8bfc6cdbd2be.json";
+            string tokenBot = System.IO.File.ReadAllText(@"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\Token_BOT.txt");
+            string dFlowKeyPath = @"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\WPF_Telegram_Bot\iksbot-9tan-8bfc6cdbd2be.json";
+            //string tokenBot = System.IO.File.ReadAllText(@"D:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\Token_BOT.txt");
+            //string dFlowKeyPath = @"D:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\WPF_Telegram_Bot\iksbot-9tan-8bfc6cdbd2be.json";
 
             if (!Directory.Exists(Path))
                 Directory.CreateDirectory(Path);
@@ -179,15 +179,15 @@ namespace WPF_Telegram_Bot
                 LettersConstellations temp2 = new LettersConstellations(letter, constellations);
                 LettersConstellations.AlphabetConstellations.Add(temp2);
             }
-
+            
             bot.OnMessage += BotOnMessage;
             bot.OnCallbackQuery += BotOnCallbackQuery;
             bot.StartReceiving();
             var iAm = bot.GetMeAsync().Result;
-            ListBoxUsers = new ObservableCollection<UserLog>();
-            UsersBotLogs = new ObservableCollection<UserLog>();
-            CMD.ItemsSource = UsersBotLogs;
-            UsersList.ItemsSource = ListBoxUsers;
+            ListBoxUserList = new ObservableCollection<UserLog>();
+            ListBoxUsersBotLogsCmd = new ObservableCollection<UserLog>();
+            CMD.ItemsSource = ListBoxUsersBotLogsCmd;
+            UsersList.ItemsSource = ListBoxUserList;
 
             //Console.ReadLine();
             
@@ -208,7 +208,7 @@ namespace WPF_Telegram_Bot
                 string fileName = RequestFiles.FileListName[indexFileName].ToString();
 
                 SendFiles(Path + $@"\{Message.From.FirstName}_{Message.Chat.Id}\{type}\{fileName}", $"{fileName}", type);
-                DataToMainWindow(UsersBotLogs, $"Отправлен файл {fileName}");
+                DataToMainWindow(ListBoxUsersBotLogsCmd, $"Отправлен файл {fileName}");
                 return;
             }
             //во второе условие приходят данные для дальнейшего поиска нужных типов сохраненных файлов
@@ -242,7 +242,7 @@ namespace WPF_Telegram_Bot
                                 await bot.SendPhotoAsync(Message.From.Id, item.UrlMap);
                                 await bot.SendPhotoAsync(Message.From.Id, item.UrlPhoto);
                                 await bot.SendTextMessageAsync(Message.From.Id, item.Text);
-                                DataToMainWindow(UsersBotLogs, $"Созвездие {item.Name}");
+                                DataToMainWindow(ListBoxUsersBotLogsCmd, $"Созвездие {item.Name}");
                             }
                         }
                     }
@@ -263,7 +263,7 @@ namespace WPF_Telegram_Bot
             window.Dispatcher.Invoke(() =>
             {
                 //listBoxData.Add($"Сообщение от {firstName}, текст: {Message.Text}");
-                UsersBotLogs.Add(new UserLog(Message.Chat.Id, firstName, Message.Text));
+                ListBoxUsersBotLogsCmd.Add(new UserLog(Message.Chat.Id, firstName, Message.Text));
             });
 
 
@@ -277,11 +277,11 @@ namespace WPF_Telegram_Bot
                 Directory.CreateDirectory(Path + $@"\{firstName}_{Message.Chat.Id}\Document");
             }
 
-            if(ListBoxUsers.All(user => user.Id != tempUser.Id))
+            if(ListBoxUserList.All(user => user.Id != tempUser.Id))
             {
                 window.Dispatcher.Invoke(() =>
                 {
-                    ListBoxUsers.Add(new UserLog(Message.Chat.Id, firstName));
+                    ListBoxUserList.Add(new UserLog(Message.Chat.Id, firstName));
                 });
             }
             //условие при котором формируются Inline кнопки созвездий согласно буквы
@@ -406,26 +406,26 @@ namespace WPF_Telegram_Bot
             {
                 case MessageType.Photo:
                     //Console.WriteLine("Получено фото ");
-                    DataToMainWindow(UsersBotLogs, "Получено фото ");
+                    DataToMainWindow(ListBoxUsersBotLogsCmd, "Получено фото ");
                     string photoFileId = Message.Photo[Message.Photo.Length - 1].FileId;
                     Download(photoFileId, Path + $@"\{firstName}_{Message.Chat.Id}\Photo\" + (Message.Photo[Message.Photo.Length - 1]).FileUniqueId + ".jpg");
                     await bot.SendTextMessageAsync(Message.From.Id, "я сохранил это");
                     break;
                 case MessageType.Document:
                     //Console.WriteLine("Получен документ " + Message.Document.FileName);
-                    DataToMainWindow(UsersBotLogs, "Получен документ " + Message.Document.FileName);
+                    DataToMainWindow(ListBoxUsersBotLogsCmd, "Получен документ " + Message.Document.FileName);
                    Download(e.Message.Document.FileId, Path + $@"\{firstName}_{Message.Chat.Id}\Document\" + Message.Document.FileName);
                     await bot.SendTextMessageAsync(Message.From.Id, "я сохранил это");
                     break;
                 case MessageType.Video:
                     //Console.WriteLine("Получен видео файл " + Message.Video.FileName);
-                    DataToMainWindow(UsersBotLogs, "Получен видео файл " + Message.Video.FileName);
+                    DataToMainWindow(ListBoxUsersBotLogsCmd, "Получен видео файл " + Message.Video.FileName);
                     Download(Message.Video.FileId, Path + $@"\{firstName}_{Message.Chat.Id}\Video\" + Message.Video.FileName);
                     await bot.SendTextMessageAsync(Message.From.Id, "я сохранил это");
                     break;
                 case MessageType.Audio:
                     //Console.WriteLine("Получен аудио файл " + Message.Audio.FileName);
-                    DataToMainWindow(UsersBotLogs, "Получен аудио файл " + Message.Audio.FileName);
+                    DataToMainWindow(ListBoxUsersBotLogsCmd, "Получен аудио файл " + Message.Audio.FileName);
                     Download(Message.Audio.FileId, Path + $@"\{firstName}_{Message.Chat.Id}\Audio\" + Message.Audio.FileName);
                     await bot.SendTextMessageAsync(Message.From.Id, "я сохранил это");
                     break;
@@ -463,12 +463,13 @@ namespace WPF_Telegram_Bot
 
         async private void SendMsg_Click(object sender, RoutedEventArgs e)
         {
-            if (String.IsNullOrEmpty(TextToUser))
+            if (String.IsNullOrEmpty(TextToUser) | String.IsNullOrEmpty(Id.Text))
             {
                 Messages.Text = "Сообщение пользователю";
+                MessageBox.Show("Укажите пользователя и текст сообщение", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            await bot.SendTextMessageAsync(Message.From.Id, TextToUser);
+            await bot.SendTextMessageAsync(long.Parse(Id.Text), TextToUser);
             SendText(TextToUser);
             TextToUser = default;
             Messages.Text = "Сообщение пользователю";
@@ -503,8 +504,8 @@ namespace WPF_Telegram_Bot
         /// <returns></returns>
         private void SendText(string messageText)
         {
-            UsersBotLogs.Add(new UserLog(Message.Chat.Id, firstName, messageText));
-            CMD.ItemsSource = UsersBotLogs;
+            ListBoxUsersBotLogsCmd.Add(new UserLog(Message.Chat.Id, firstName, messageText));
+            CMD.ItemsSource = ListBoxUsersBotLogsCmd;
         }
     }
 }

@@ -16,7 +16,7 @@ namespace WPF_Telegram_Bot
 
         public UserLog()
         { }
-       public UserLog(long id, string name, string messageText)
+        public UserLog(long id, string name, string messageText)
         {
             Id = id;
             Name = name;
@@ -29,10 +29,10 @@ namespace WPF_Telegram_Bot
             Name = name;
         }
 
-        public override string ToString()
-        {
-            return $"Id {Id}, {Name}: {MessageText}";
-        }
+        //public override string ToString()
+        //{
+        //    return $"Id {Id}, {Name}: {MessageText}";
+        //}
         
     }
 }

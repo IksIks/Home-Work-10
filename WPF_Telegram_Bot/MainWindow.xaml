@@ -13,23 +13,43 @@
         </Grid.ColumnDefinitions>
         <StackPanel>
             <ScrollViewer Margin="15" Height="300">
-                <ListBox x:Name="UsersList" Background="Black" Foreground="White"/>
+                <ListBox x:Name="UsersList" Background="Black" Foreground="White">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Id}" />
+                                <TextBlock Text="{Binding Name}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </ScrollViewer>
+            <TextBox x:Name="Id" Visibility="Hidden" Text="{Binding ElementName=UsersList, Path=SelectedItem.Id}"/>
             <Button x:Name="Document" Click="BtnClick" Content="Документы" Height="50" Width="100" Margin="25,0,0,5" HorizontalAlignment="Left"/>
             <Button x:Name="Audio" Click="BtnClick" Content="Аудио" Height="50" Width="100" Margin="25,0,0,5" HorizontalAlignment="Left"/>
             <Button x:Name="Photo" Click="BtnClick" Content="Фото" Height="50" Width="100" Margin="25,0,0,5" HorizontalAlignment="Left"/>
             <Button x:Name="Video" Click="BtnClick" Content="Видео" Height="50" Width="100" Margin="25,0,0,5" HorizontalAlignment="Left"/>
         </StackPanel>
-        <StackPanel Grid.Column="1">
-        <ScrollViewer Margin="15" Height="400">
-                <ListBox x:Name="CMD" Background="Black" Foreground="White" />
-        </ScrollViewer>
+        <StackPanel Grid.Column="1" Margin="0,4,0,-4">
+            <ScrollViewer Margin="15" Height="400">
+                <ListBox x:Name="CMD" Background="Black" Foreground="White">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <WrapPanel>
+                                <TextBlock Text="{Binding Id}"/>
+                                <TextBlock Text="{Binding Name}"/>
+                                <TextBlock Text="{Binding MessageText}"/>
+                            </WrapPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
             <TextBox x:Name="Messages" TextChanged="Messages_TextChanged" Width="300" Height="50" Margin="10" TextWrapping="Wrap"
                      SpellCheck.IsEnabled="True" Language="ru-ru" VerticalScrollBarVisibility="Auto" AcceptsReturn="True"
                      MouseEnter="Messages_MouseEnter">
                 Сообщение пользователю
             </TextBox>
-        <Button x:Name="SendMsg" Click="SendMsg_Click" Content="Отправить" Height="50" Width="100" Margin="21,0,0,5" HorizontalAlignment="Left"/>
+            <Button x:Name="SendMsg" Click="SendMsg_Click" Content="Отправить" Height="50" Width="100" Margin="21,0,0,5" HorizontalAlignment="Left"/>
         </StackPanel>
     </Grid>
 </Window>
