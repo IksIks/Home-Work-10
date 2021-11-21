@@ -435,26 +435,28 @@ namespace WPF_Telegram_Bot
 
         private void BtnClick(object sender, RoutedEventArgs e)
         {
+            long chatId = long.Parse(Id.Text);
+            string name = Name.Text;
             switch (((Button)sender).Name)
             {
                 case "Document":
                     {
-                        Process.Start(Path + $@"\{firstName}_{Message.Chat.Id}\Document");
+                        Process.Start(Path + $@"\{name}_{chatId}\Document");
                         break;
                     }
                 case "Audio":
                     {
-                        Process.Start(Path + $@"\{firstName}_{Message.Chat.Id}\Audio");
+                        Process.Start(Path + $@"\{name}_{chatId}\Audio");
                         break;
                     }
                 case "Photo":
                     {
-                        Process.Start(Path + $@"\{firstName}_{Message.Chat.Id}\Photo");
+                        Process.Start(Path + $@"\{name}_{chatId}\Photo");
                         break;
                     }
                 case "Video":
                     {
-                        Process.Start(Path + $@"\{firstName}_{Message.Chat.Id}\Video");
+                        Process.Start(Path + $@"\{name}_{chatId}\Video");
                         break;
                     }
             }
@@ -463,12 +465,14 @@ namespace WPF_Telegram_Bot
 
         async private void SendMsg_Click(object sender, RoutedEventArgs e)
         {
+           
             if (String.IsNullOrEmpty(TextToUser) | String.IsNullOrEmpty(Id.Text))
             {
                 Messages.Text = "Сообщение пользователю";
                 MessageBox.Show("Укажите пользователя и текст сообщение", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+            
             await bot.SendTextMessageAsync(long.Parse(Id.Text), TextToUser);
             SendText(TextToUser);
             TextToUser = default;
@@ -504,7 +508,8 @@ namespace WPF_Telegram_Bot
         /// <returns></returns>
         private void SendText(string messageText)
         {
-            ListBoxUsersBotLogsCmd.Add(new UserLog(Message.Chat.Id, firstName, messageText));
+            var botData = bot.GetMeAsync().Result;
+            ListBoxUsersBotLogsCmd.Add(new UserLog(botData.Id, "Admin", messageText));
             CMD.ItemsSource = ListBoxUsersBotLogsCmd;
         }
     }
