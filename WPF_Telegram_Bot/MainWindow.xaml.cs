@@ -134,11 +134,12 @@ namespace WPF_Telegram_Bot
         {
             InitializeComponent();
             
+
             window = this;
-            string tokenBot = System.IO.File.ReadAllText(@"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\Token_BOT.txt");
-            string dFlowKeyPath = @"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\WPF_Telegram_Bot\iksbot-9tan-8bfc6cdbd2be.json";
-            //string tokenBot = System.IO.File.ReadAllText(@"D:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\Token_BOT.txt");
-            //string dFlowKeyPath = @"D:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\WPF_Telegram_Bot\iksbot-9tan-8bfc6cdbd2be.json";
+            //string tokenBot = System.IO.File.ReadAllText(@"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\Token_BOT.txt");
+            //string dFlowKeyPath = @"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\WPF_Telegram_Bot\iksbot-9tan-8bfc6cdbd2be.json";
+            string tokenBot = System.IO.File.ReadAllText(@"D:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\Token_BOT.txt");
+            string dFlowKeyPath = @"D:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\WPF_Telegram_Bot\iksbot-9tan-8bfc6cdbd2be.json";
 
             if (!Directory.Exists(Path))
                 Directory.CreateDirectory(Path);
@@ -184,8 +185,18 @@ namespace WPF_Telegram_Bot
             bot.OnCallbackQuery += BotOnCallbackQuery;
             bot.StartReceiving();
             var iAm = bot.GetMeAsync().Result;
-            ListBoxUserList = new ObservableCollection<UserLog>();
+            ListBoxUserList = new ObservableCollection<UserLog>()
+            {
+                new UserLog(1111111111, "test1"),
+                new UserLog(2222222222, "test2"),
+                new UserLog(3333333333, "test3"),
+                new UserLog(4444444444, "test4"),
+                new UserLog(5555555555, "test5"),
+                new UserLog(6666666666, "test6"),
+                new UserLog(7777777777, "test7")
+            };
             ListBoxUsersBotLogsCmd = new ObservableCollection<UserLog>();
+            Choise.ItemsSource = ListBoxUserList;
             CMD.ItemsSource = ListBoxUsersBotLogsCmd;
             UsersList.ItemsSource = ListBoxUserList;
 
@@ -257,12 +268,12 @@ namespace WPF_Telegram_Bot
             Message = e.Message;
             firstName = Message.From.FirstName;
             UserLog tempUser = new UserLog(Message.Chat.Id, firstName);
-            //UsersBotLogs.Add(new UserLog(Message.Chat.Id, firstName, Message.Text));
+            
             string answerText = default;
+
             // передача в основной поток, как работает не знаю, смотрите ДЗ 10.4 на 7 минуте, там ничего не сказано 
             window.Dispatcher.Invoke(() =>
             {
-                //listBoxData.Add($"Сообщение от {firstName}, текст: {Message.Text}");
                 ListBoxUsersBotLogsCmd.Add(new UserLog(Message.Chat.Id, firstName, Message.Text));
             });
 
@@ -284,6 +295,7 @@ namespace WPF_Telegram_Bot
                     ListBoxUserList.Add(new UserLog(Message.Chat.Id, firstName));
                 });
             }
+
             //условие при котором формируются Inline кнопки созвездий согласно буквы
             if (Message.Type == MessageType.Text && Message.Text.Length == 1)
             {
@@ -435,6 +447,8 @@ namespace WPF_Telegram_Bot
 
         private void BtnClick(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrEmpty(Id.Text))
+                return;
             long chatId = long.Parse(Id.Text);
             string name = Name.Text;
             switch (((Button)sender).Name)
@@ -465,7 +479,6 @@ namespace WPF_Telegram_Bot
 
         async private void SendMsg_Click(object sender, RoutedEventArgs e)
         {
-           
             if (String.IsNullOrEmpty(TextToUser) | String.IsNullOrEmpty(Id.Text))
             {
                 Messages.Text = "Сообщение пользователю";
@@ -512,5 +525,26 @@ namespace WPF_Telegram_Bot
             ListBoxUsersBotLogsCmd.Add(new UserLog(botData.Id, "Admin", messageText));
             CMD.ItemsSource = ListBoxUsersBotLogsCmd;
         }
+
+        private void SaveLog_Click(object sender, RoutedEventArgs e)
+        {
+            if (String.IsNullOrEmpty(Choise.Text))
+            {
+                MessageBox.Show("Укажите пользователя", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            var temp = (Choise.Text).Split(' ', ',', ':', '"');
+            создание метода по сераилизации логов
+        }     
+        
+            
+        private void Choise_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox temp = (ComboBox)sender;
+            Choise.Text = temp.SelectedItem.ToString();
+        }
+
+        
     }
+    
 }

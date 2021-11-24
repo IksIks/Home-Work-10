@@ -12,19 +12,28 @@ namespace WPF_Telegram_Bot
         public long Id { get; set; }
         public string Name { get; set; }
         public string MessageText { get; set; }
+        public DateTime MessageTime { get; set; }
 
         public UserLog()
         { }
+        public UserLog(long id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
         public UserLog(long id, string name, string messageText)
         {
             Id = id;
             Name = name;
             MessageText = messageText;
         }
-        public UserLog(long id, string name)
+
+        public UserLog(long id, string name, string messageText, DateTime messageTime)
         {
             Id = id;
             Name = name;
+            MessageText = messageText;
+            MessageTime = messageTime;
         }
         public override string ToString()
         {
