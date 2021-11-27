@@ -274,7 +274,7 @@ namespace WPF_Telegram_Bot
             // передача в основной поток, как работает не знаю, смотрите ДЗ 10.4 на 7 минуте, там ничего не сказано 
             window.Dispatcher.Invoke(() =>
             {
-                ListBoxUsersBotLogsCmd.Add(new UserLog(Message.Chat.Id, firstName, Message.Text));
+                ListBoxUsersBotLogsCmd.Add(new UserLog(Message.Chat.Id, firstName, Message.Text, Message.Date));
             });
 
 
@@ -335,6 +335,7 @@ namespace WPF_Telegram_Bot
                         }
                     });
                     await bot.SendTextMessageAsync(Message.From.Id, "Укажите тип файлов на клавитатуре", replyMarkup: keyboardInline);
+                    
                     break;
                 case "Инф. о созвездиях":
                     var alphabetKeyboard = new ReplyKeyboardMarkup(new[]
@@ -506,7 +507,7 @@ namespace WPF_Telegram_Bot
         /// отправка данных в MainWindow через Диспетчер из другого потока
         /// </summary>
         /// <param name="messageText">текст принятый от пользователя</param>
-        private static void DataToMainWindow(ObservableCollection<UserLog> collection, string messageText)
+        public static void DataToMainWindow(ObservableCollection<UserLog> collection, string messageText)
         {
 
             window.Dispatcher.Invoke(() =>
@@ -534,7 +535,10 @@ namespace WPF_Telegram_Bot
                 return;
             }
             var temp = (Choise.Text).Split(' ', ',', ':', '"');
-            создание метода по сераилизации логов
+            //создание метода по сераилизации логов
+            SerializerLog SerializeUserMessages = new SerializerLog();
+            string temp2 = SerializeUserMessages.Serialize(ListBoxUsersBotLogsCmd, Message.Chat.Id, Message.From.FirstName);
+            File.WriteAllText(Path + $@"\{Message.From.FirstName}_{Message.Chat.Id}\log.json", temp2);
         }     
         
             
