@@ -136,10 +136,10 @@ namespace WPF_Telegram_Bot
             
 
             window = this;
-            //string tokenBot = System.IO.File.ReadAllText(@"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\Token_BOT.txt");
-            //string dFlowKeyPath = @"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\WPF_Telegram_Bot\iksbot-9tan-8bfc6cdbd2be.json";
-            string tokenBot = System.IO.File.ReadAllText(@"D:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\Token_BOT.txt");
-            string dFlowKeyPath = @"D:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\WPF_Telegram_Bot\iksbot-9tan-8bfc6cdbd2be.json";
+            string tokenBot = System.IO.File.ReadAllText(@"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\Token_BOT.txt");
+            string dFlowKeyPath = @"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\WPF_Telegram_Bot\iksbot-9tan-8bfc6cdbd2be.json";
+            //string tokenBot = System.IO.File.ReadAllText(@"D:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\Token_BOT.txt");
+            //string dFlowKeyPath = @"D:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\WPF_Telegram_Bot\iksbot-9tan-8bfc6cdbd2be.json";
 
             if (!Directory.Exists(Path))
                 Directory.CreateDirectory(Path);
@@ -286,6 +286,7 @@ namespace WPF_Telegram_Bot
                 Directory.CreateDirectory(Path + $@"\{firstName}_{Message.Chat.Id}\Audio");
                 Directory.CreateDirectory(Path + $@"\{firstName}_{Message.Chat.Id}\Photo");
                 Directory.CreateDirectory(Path + $@"\{firstName}_{Message.Chat.Id}\Document");
+                Directory.CreateDirectory(Path + $@"\{firstName}_{Message.Chat.Id}\Logs");
             }
 
             if(ListBoxUserList.All(user => user.Id != tempUser.Id))
@@ -529,16 +530,23 @@ namespace WPF_Telegram_Bot
 
         private void SaveLog_Click(object sender, RoutedEventArgs e)
         {
+            string pathForLog = Path + $@"\{Message.From.FirstName}_{Message.Chat.Id}\Logs\log_{DateTime.Now.ToShortDateString()}.json";
             if (String.IsNullOrEmpty(Choise.Text))
             {
                 MessageBox.Show("Укажите пользователя", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            var temp = (Choise.Text).Split(' ', ',', ':', '"');
-            //создание метода по сераилизации логов
+            
             SerializerLog SerializeUserMessages = new SerializerLog();
-            string temp2 = SerializeUserMessages.Serialize(ListBoxUsersBotLogsCmd, Message.Chat.Id, Message.From.FirstName);
-            File.WriteAllText(Path + $@"\{Message.From.FirstName}_{Message.Chat.Id}\log.json", temp2);
+            
+            if (!File.Exists(pathForLog))
+                File.WriteAllText(pathForLog, SerializeUserMessages.Serialize(ListBoxUsersBotLogsCmd
+                                                                              ,Message.Chat.Id
+                                                                              ,Message.From.FirstName));
+            // дозапись последних сообщений в Log пользователя за текущую дату
+            else File.AppendAllText(pathForLog, SerializeUserMessages.Serialize(ListBoxUsersBotLogsCmd
+                                                                               ,Message.Chat.Id
+                                                                               ,File.GetLastWriteTime(pathForLog)));
         }     
         
             

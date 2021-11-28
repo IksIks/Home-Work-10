@@ -13,18 +13,39 @@ namespace WPF_Telegram_Bot
     {
         public string Serialize (ObservableCollection<UserLog> userLogs, long Id, string Name)
         {
-            JObject json = new JObject();
             JObject joUser = new JObject();
             JArray jaMessages = new JArray();
+            joUser["Время записи"] = DateTime.Now.ToShortTimeString();
             joUser["Id"] = Id;
             joUser["Имя Пользователя"] = Name;
-            joUser["Дата сообщениий"] = userLogs[0].MessageTime.ToShortDateString();
             
             foreach (var item in userLogs)
             {
+                JObject joMessage = new JObject();
                 if (item.Id == Id)
                 {
-                    jaMessages.Add(item.MessageText);
+                    joMessage["Время отправки"] = (item.MessageTime.ToLocalTime()).ToShortTimeString();
+                    joMessage["Текст"] = item.MessageText;
+                    jaMessages.Add(joMessage);
+                }
+            }
+            joUser["Сообщения"] = jaMessages;
+            return joUser.ToString();
+        }
+
+        public string Serialize(ObservableCollection<UserLog> userLogs, long Id, DateTime lastChanges)
+        {
+            JObject joUser = new JObject();
+            JArray jaMessages = new JArray();
+            joUser["Время записи"] = DateTime.Now.ToShortTimeString();
+            foreach (var item in userLogs)
+            {
+                JObject joMessage = new JObject();
+                if (item.Id == Id & item.MessageTime.ToLocalTime() > lastChanges)
+                {
+                    joMessage["Время отправки"] = (item.MessageTime.ToLocalTime()).ToShortTimeString();
+                    joMessage["Текст"] = item.MessageText;
+                    jaMessages.Add(joMessage);
                 }
             }
             joUser["Сообщения"] = jaMessages;
