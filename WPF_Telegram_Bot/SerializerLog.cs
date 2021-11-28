@@ -11,6 +11,13 @@ namespace WPF_Telegram_Bot
 {
     public class SerializerLog
     {
+        /// <summary>
+        /// сериализация выполняемая при первом создании Log пользователя
+        /// </summary>
+        /// <param name="userLogs">коллекция всех сообщений, отправленных боту, от всех пользователей</param>
+        /// <param name="Id">Id пользователя</param>
+        /// <param name="Name">Имя пользователя</param>
+        /// <returns></returns>
         public string Serialize (ObservableCollection<UserLog> userLogs, long Id, string Name)
         {
             JObject joUser = new JObject();
@@ -33,6 +40,13 @@ namespace WPF_Telegram_Bot
             return joUser.ToString();
         }
 
+        /// <summary>
+        /// сериализация выполняемая при дозаписывании Log пользователя
+        /// </summary>
+        /// <param name="userLogs">коллекция всех сообщений, отправленных боту, от всех пользователей</param>
+        /// <param name="Id">Id пользователя</param>
+        /// <param name="lastChanges">значение последнего изменения(записи) файла .json</param>
+        /// <returns></returns>
         public string Serialize(ObservableCollection<UserLog> userLogs, long Id, DateTime lastChanges)
         {
             JObject joUser = new JObject();

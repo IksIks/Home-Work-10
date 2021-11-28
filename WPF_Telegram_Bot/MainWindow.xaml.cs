@@ -45,7 +45,7 @@ namespace WPF_Telegram_Bot
         //переменная для возможности передачи в основной поток
         private static MainWindow window;
 
-        // свойство для записи вводимого администратором текста для отправки его выбранному пользователю
+        // свойство для записи вводимого администратором текста для дальнейшей отправки его выбранному пользователю
         public string TextToUser { get; set; }
 
         // свойство для записи логов всех подключаемых пользователей и передачи в ListBox "CMD"
@@ -185,16 +185,15 @@ namespace WPF_Telegram_Bot
             bot.OnCallbackQuery += BotOnCallbackQuery;
             bot.StartReceiving();
             var iAm = bot.GetMeAsync().Result;
-            ListBoxUserList = new ObservableCollection<UserLog>()
-            {
-                new UserLog(1111111111, "test1"),
-                new UserLog(2222222222, "test2"),
-                new UserLog(3333333333, "test3"),
-                new UserLog(4444444444, "test4"),
-                new UserLog(5555555555, "test5"),
-                new UserLog(6666666666, "test6"),
-                new UserLog(7777777777, "test7")
-            };
+            ListBoxUserList = new ObservableCollection<UserLog>();
+            //{
+            //    new UserLog(1111111111, "test1", "проверка 1", DateTime.Now),
+            //    new UserLog(2222222222, "test2","проверка 2", DateTime.Now.AddMinutes(2)),
+            //    new UserLog(3333333333, "test3","проверка 3", DateTime.Now.AddMinutes(4)),
+            //    new UserLog(4444444444, "test4","проверка 4", DateTime.Now.AddMinutes(6)),
+            //    new UserLog(5555555555, "test5","проверка 5", DateTime.Now.AddMinutes(9)),
+
+            //};
             ListBoxUsersBotLogsCmd = new ObservableCollection<UserLog>();
             Choise.ItemsSource = ListBoxUserList;
             CMD.ItemsSource = ListBoxUsersBotLogsCmd;
@@ -446,7 +445,11 @@ namespace WPF_Telegram_Bot
             }
 
         }
-
+        /// <summary>
+        /// открытие в explorer соотвествующей папки пользователя
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BtnClick(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(Id.Text))
@@ -479,6 +482,11 @@ namespace WPF_Telegram_Bot
 
         }
 
+        /// <summary>
+        /// отправка ВЫБРАННОМУ пользоваелю сообщения от имени администратора
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         async private void SendMsg_Click(object sender, RoutedEventArgs e)
         {
             if (String.IsNullOrEmpty(TextToUser) | String.IsNullOrEmpty(Id.Text))
@@ -494,6 +502,11 @@ namespace WPF_Telegram_Bot
             Messages.Text = "Сообщение пользователю";
         }
 
+        /// <summary>
+        /// передача введенного текста из TextBox "Messages"
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Messages_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextToUser = Messages.Text;
@@ -516,6 +529,7 @@ namespace WPF_Telegram_Bot
                 collection.Add(new UserLog(Message.Chat.Id, firstName, messageText));
             });
         }
+
         /// <summary>
         /// возможность отправки логов в поле ListBox (x:Name="CMD") из обработчиков окна MainWindow.xaml
         /// </summary>
@@ -528,8 +542,14 @@ namespace WPF_Telegram_Bot
             CMD.ItemsSource = ListBoxUsersBotLogsCmd;
         }
 
+        /// <summary>
+        /// сохранение логов выбранного пользователя
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SaveLog_Click(object sender, RoutedEventArgs e)
         {
+            // путь к папке Log текущего пользователя
             string pathForLog = Path + $@"\{Message.From.FirstName}_{Message.Chat.Id}\Logs\log_{DateTime.Now.ToShortDateString()}.json";
             if (String.IsNullOrEmpty(Choise.Text))
             {
@@ -547,16 +567,30 @@ namespace WPF_Telegram_Bot
             else File.AppendAllText(pathForLog, SerializeUserMessages.Serialize(ListBoxUsersBotLogsCmd
                                                                                ,Message.Chat.Id
                                                                                ,File.GetLastWriteTime(pathForLog)));
-        }     
-        
-            
-        private void Choise_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ComboBox temp = (ComboBox)sender;
-            Choise.Text = temp.SelectedItem.ToString();
         }
-
         
+        
+        /// <summary>
+        /// сохранение всех логов всех пользователей по папкам
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SaveAllLog_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var user in ListBoxUserList)
+            {
+                string pathForLog = Path + $@"\{Message.From.FirstName}_{Message.Chat.Id}\Logs\log_{DateTime.Now.ToShortDateString()}.json";
+                SerializerLog SerializeUserMessages = new SerializerLog();
+                if (!File.Exists(pathForLog))
+                    File.WriteAllText(pathForLog, SerializeUserMessages.Serialize(ListBoxUsersBotLogsCmd
+                                                                                  , Message.Chat.Id
+                                                                                  , Message.From.FirstName));
+                // дозапись последних сообщений в Log пользователя за текущую дату
+                else File.AppendAllText(pathForLog, SerializeUserMessages.Serialize(ListBoxUsersBotLogsCmd
+                                                                                   , Message.Chat.Id
+                                                                                   , File.GetLastWriteTime(pathForLog)));
+            }
+        }
     }
     
 }

@@ -32,8 +32,8 @@
                 <Canvas Grid.Row="1">
                     <TextBox x:Name="Id" Visibility="Hidden" Text="{Binding ElementName=UsersList, Path=SelectedItem.Id}"/>
                     <TextBox x:Name="Name" Visibility="Hidden" Text="{Binding ElementName=UsersList, Path=SelectedItem.Name}"/>
-                    <ComboBox x:Name="Choise" Height="25" Width="190" Margin="25,0,0,5" SelectionChanged ="Choise_SelectionChanged"
-                              Canvas.Top="206" IsReadOnly="True" Canvas.Left="3">
+                    <ComboBox x:Name="Choise" Height="25" Width="237" Margin="25,0,0,5" 
+                              Canvas.Top="155" IsReadOnly="True" Canvas.Left="3">
                         <ComboBox.Background>
                             <LinearGradientBrush EndPoint="0,1">
                                 <GradientStop Color="#FFF0F0F0"/>
@@ -45,7 +45,8 @@
                     <Button x:Name="Audio" Click="BtnClick" Content="Аудио" Height="50" Width="100" Margin="25,0,0,5" Canvas.Left="140"/>
                     <Button x:Name="Photo" Click="BtnClick" Content="Фото" Height="50" Width="100" Margin="25,0,0,5" Canvas.Left="3" Canvas.Top="70"/>
                     <Button x:Name="Video" Click="BtnClick" Content="Видео" Height="50" Width="100" Margin="25,0,0,5" Canvas.Left="140" Canvas.Top="70"/>
-                    <Button x:Name="SaveLog" Click="SaveLog_Click" Content="Save Log" Height="23" Width="101" Margin="25,0,0,5" Canvas.Left="3" Canvas.Top="236"/>
+                    <Button x:Name="SaveLog" Click="SaveLog_Click" Content="Save Log" Height="23" Width="101" Margin="25,0,0,5" Canvas.Left="3" Canvas.Top="190"/>
+                    <Button x:Name="SaveAll" Click="SaveAllLog_Click" Content="Save All Users Log" Height="23" Width="120" Canvas.Left="140" Canvas.Top="190"/>
                 </Canvas>
             </Grid>
 
