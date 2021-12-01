@@ -6,9 +6,9 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 //using System.Windows.Data;
-//using System.Windows.Documents;
+using System.Windows.Documents;
 using System.Windows.Input;
-//using System.Windows.Media;
+using System.Windows.Media;
 //using System.Windows.Media.Imaging;
 //using System.Windows.Navigation;
 //using System.Windows.Shapes;
@@ -140,7 +140,7 @@ namespace WPF_Telegram_Bot
             string dFlowKeyPath = @"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\WPF_Telegram_Bot\iksbot-9tan-8bfc6cdbd2be.json";
             //string tokenBot = System.IO.File.ReadAllText(@"D:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\Token_BOT.txt");
             //string dFlowKeyPath = @"D:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\WPF_Telegram_Bot\iksbot-9tan-8bfc6cdbd2be.json";
-
+            
             if (!Directory.Exists(Path))
                 Directory.CreateDirectory(Path);
 
@@ -186,22 +186,10 @@ namespace WPF_Telegram_Bot
             bot.StartReceiving();
             var iAm = bot.GetMeAsync().Result;
             ListBoxUserList = new ObservableCollection<UserLog>();
-            //{
-            //    new UserLog(1111111111, "test1", "проверка 1", DateTime.Now),
-            //    new UserLog(2222222222, "test2","проверка 2", DateTime.Now.AddMinutes(2)),
-            //    new UserLog(3333333333, "test3","проверка 3", DateTime.Now.AddMinutes(4)),
-            //    new UserLog(4444444444, "test4","проверка 4", DateTime.Now.AddMinutes(6)),
-            //    new UserLog(5555555555, "test5","проверка 5", DateTime.Now.AddMinutes(9)),
-
-            //};
             ListBoxUsersBotLogsCmd = new ObservableCollection<UserLog>();
             Choise.ItemsSource = ListBoxUserList;
             CMD.ItemsSource = ListBoxUsersBotLogsCmd;
             UsersList.ItemsSource = ListBoxUserList;
-
-            //Console.ReadLine();
-            
-            //bot.StopReceiving();
         }
 
         [Obsolete]
@@ -491,15 +479,13 @@ namespace WPF_Telegram_Bot
         {
             if (String.IsNullOrEmpty(TextToUser) | String.IsNullOrEmpty(Id.Text))
             {
-                Messages.Text = "Сообщение пользователю";
                 MessageBox.Show("Укажите пользователя и текст сообщение", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             
             await bot.SendTextMessageAsync(long.Parse(Id.Text), TextToUser);
             SendText(TextToUser);
-            TextToUser = default;
-            Messages.Text = "Сообщение пользователю";
+            Messages.Clear();
         }
 
         /// <summary>
@@ -510,11 +496,6 @@ namespace WPF_Telegram_Bot
         private void Messages_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextToUser = Messages.Text;
-        }
-
-        private void Messages_MouseEnter(object sender, MouseEventArgs e)
-        {
-            Messages.Clear();
         }
 
         /// <summary>
@@ -558,7 +539,6 @@ namespace WPF_Telegram_Bot
             }
             
             SerializerLog SerializeUserMessages = new SerializerLog();
-            
             if (!File.Exists(pathForLog))
                 File.WriteAllText(pathForLog, SerializeUserMessages.Serialize(ListBoxUsersBotLogsCmd
                                                                               ,Message.Chat.Id
@@ -568,7 +548,6 @@ namespace WPF_Telegram_Bot
                                                                                ,Message.Chat.Id
                                                                                ,File.GetLastWriteTime(pathForLog)));
         }
-        
         
         /// <summary>
         /// сохранение всех логов всех пользователей по папкам
@@ -592,5 +571,4 @@ namespace WPF_Telegram_Bot
             }
         }
     }
-    
 }
