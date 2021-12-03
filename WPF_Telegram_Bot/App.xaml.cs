@@ -13,5 +13,6 @@ namespace WPF_Telegram_Bot
     /// </summary>
     public partial class App : Application
     {
+        
     }
 }

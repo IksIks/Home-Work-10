@@ -17,7 +17,7 @@ namespace WPF_Telegram_Bot
             FileListName = files.GetFiles().ToList();
             if (FileListName.Count == 0)
             {
-                MainWindow.DataToMainWindow(MainWindow.ListBoxUsersBotLogsCmd, $"Нет сохраненных {fileType}, отправьте мне что - нибудь для начала"); ;;
+                MainWindow.DataToMainWindow(MainWindow.UsersBotCmdListBox, $"Нет сохраненных {fileType}, отправьте мне что - нибудь для начала"); ;;
                 await MainWindow.bot.SendTextMessageAsync(MainWindow.Message.Chat.Id, "Нет сохраненных файлов, отправьте мне что-нибудь для начала");
                 return;
             }

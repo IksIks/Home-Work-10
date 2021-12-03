@@ -4,20 +4,19 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:local="clr-namespace:WPF_Telegram_Bot"
-        xmlns:i ="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:local="clr-namespace:WPF_Telegram_Bot"        
         mc:Ignorable="d"
-        Title="Telegram_Bot" Height="650" Width="700" MinHeight="650" MinWidth="700">
+        Title="Telegram_Bot" MinHeight="650" MinWidth="700" MaxHeight="650" MaxWidth="700">
     <Grid Background="Gray">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="20*"/>
-            <ColumnDefinition Width="30*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <StackPanel Margin="0,4,0,4">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="50*"/>
-                    <RowDefinition Height="50*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <ScrollViewer Margin="20,0,0,15" Height="300" Width="250" HorizontalAlignment="Left" materialDesign:ScrollViewerAssist.CornerRectangleVisibility="Visible">
                     <ListBox x:Name="UsersList" Margin="1" Background="Black" Foreground="White" >                        
@@ -26,11 +25,6 @@
                                 <StackPanel>
                                     <TextBlock Text="{Binding Id}"/>
                                     <TextBlock Text="{Binding Name}"/>
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Opened">
-                                            <i:InvokeCommandAction Command="{Binding }"/>
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
                                 </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -48,18 +42,24 @@
                             </LinearGradientBrush>
                         </ComboBox.Background>
                     </ComboBox>
-                    <Button x:Name="Document" Click="BtnClick" Content="Документы" FontSize="12" Height="50" Width="100" Margin="25,0,0,5" Canvas.Left="3"/>
-                    <Button x:Name="Audio" Click="BtnClick" Content="Аудио" FontSize="12" Height="50" Width="100" Margin="10,0,0,5" Canvas.Left="140"/>
-                    <Button x:Name="Photo" Click="BtnClick" Content="Фото" FontSize="12" Height="50" Width="100" Margin="25,0,0,5" Canvas.Left="3" Canvas.Top="70"/>
-                    <Button x:Name="Video" Click="BtnClick" Content="Видео" FontSize="12" Height="50" Width="100" Margin="10,0,0,5" Canvas.Left="140" Canvas.Top="70"/>
-                    <Button x:Name="SaveLog" Click="SaveLog_Click" Content="Save Log" FontSize="12" Height="26" Width="101" Margin="15,0,5,0" Padding="2" Canvas.Left="3" Canvas.Top="190"/>
-                    <Button x:Name="SaveAll" Click="SaveAllLog_Click" Content="Save All Users Log" FontSize="12" Height="26" Width="120" Padding="2" Canvas.Left="140" Canvas.Top="190"/>
+                    <Button x:Name="Document" Click="BtnClick" Content="Документы" FontSize="12" Height="50" Width="100"
+                            Margin="25,0,0,5" Canvas.Left="3" Background="Brown"/>
+                    <Button x:Name="Audio" Click="BtnClick" Content="Аудио" FontSize="12" Height="50" Width="100"
+                            Margin="10,0,0,5" Canvas.Left="140" Background="Brown"/>
+                    <Button x:Name="Photo" Click="BtnClick" Content="Фото" FontSize="12" Height="50" Width="100"
+                            Margin="25,0,0,5" Canvas.Left="3" Canvas.Top="70" Background="Brown"/>
+                    <Button x:Name="Video" Click="BtnClick" Content="Видео" FontSize="12" Height="50" Width="100"
+                            Margin="10,0,0,5" Canvas.Left="140" Canvas.Top="70" Background="Brown"/>
+                    <Button x:Name="SaveLog" Click="SaveLog_Click" Content="Save Log" FontSize="12" Height="26" Width="101"
+                            Margin="15,0,5,0" Padding="2" Canvas.Left="3" Canvas.Top="190" Background="Brown"/>
+                    <Button x:Name="SaveAll" Click="SaveAllLog_Click" Content="Save All Users Log" FontSize="12" Height="26" Width="120"
+                            Padding="2" Canvas.Left="140" Canvas.Top="190" Foreground="White" Background="Brown"/>
                 </Canvas>
             </Grid>
 
         </StackPanel>
-        <StackPanel Grid.Column="1" Margin="0,4,0,4">
-            <ScrollViewer Margin="10, 10, 10, 10" Height="400" materialDesign:ScrollViewerAssist.CornerRectangleVisibility="Visible"
+        <StackPanel Grid.Column="1" Margin="0,4,0,4" Width="410">
+            <ScrollViewer Margin="10, 1, 10, 10" Height="400" materialDesign:ScrollViewerAssist.CornerRectangleVisibility="Visible"
                           ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
                 <ListBox x:Name="CMD" Background="Black" Foreground="White" Margin="1">
                     <ListBox.ItemTemplate>

@@ -26,121 +26,72 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using Microsoft.Win32;
+
+
 
 namespace WPF_Telegram_Bot
 {
     public partial class MainWindow : Window
     {
         #region Поля и свойства класса
+
+        #region Поля
         public static TelegramBotClient bot;
         private static string firstName = default;
         private static SessionsClient dFlowClient;
         private static string projectID;
         private static string sessionID;
         private static string path;
-
-        // свойство для передачи в ListBox "UserList"
-        public static ObservableCollection<UserLog> ListBoxUserList { get; set; }
-
-        //переменная для возможности передачи в основной поток
-        private static MainWindow window;
-
-        // свойство для записи вводимого администратором текста для дальнейшей отправки его выбранному пользователю
-        public string TextToUser { get; set; }
-
-        // свойство для записи логов всех подключаемых пользователей и передачи в ListBox "CMD"
-        public static ObservableCollection<UserLog> ListBoxUsersBotLogsCmd { get; set; }
-        public static Telegram.Bot.Types.Message Message { get; set; }
         #endregion
 
+        #region Свойства
+        // свойство для передачи в ListBox "UserList"
+        private static ObservableCollection<UserLog> UserListListBox { get; set; }
+        // свойство для записи логов всех подключаемых пользователей и передачи в ListBox "CMD"
+        private static ObservableCollection<UserLog> UsersBotCmdListBox { get; set; }
 
-        //Начальный путь к файлу
+        //переменная для возможности передачи в основной поток
+        private static MainWindow window { get; set; }
+
+        // свойство для записи вводимого администратором текста для дальнейшей отправки его выбранному пользователю
+        private string TextToUser { get; set; }
+
+
+        public static Telegram.Bot.Types.Message Message { get; set; }
+
+        //Начальный путь к каталогу
         public static string Path
         {
             get { return @"c:\Telegram_Bot_Users"; }
             private set { path = value; }
         }
+        #endregion
 
-        /// <summary>
-        /// Скачивание файлов
-        /// </summary>
-        /// <param name="fileId">ID файла отправленное с сервера Telegram</param>
-        /// <param name="path">путь куда сохраняется файл</param>
-        private static async void Download(string fileId, string path)
-        {
-            var file = await bot.GetFileAsync(fileId);
-            try
-            {
-                using (FileStream stream = new FileStream(path, FileMode.Create))
-                {
-                    await bot.DownloadFileAsync(file.FilePath, stream);
-                }
-            }
-            catch (Exception)
-            {
-
-                return;
-            }
-        }
-
-        /// <summary>
-        /// Отправка файла обратно пользователю
-        /// </summary>
-        /// <param name="path">Путь где лежит файл</param>
-        /// <param name="fileName">имя файла</param>
-        /// <param name="messageType">Тип документа (Document, Video, etc..)</param>
-        private static async void SendFiles(string path, string fileName, string messageType)
-        {
-
-            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
-            {
-                switch (messageType)
-                {
-                    case ("Document"):
-                        {
-                            Console.WriteLine($"Отправлен файл {fileName}");
-                            await bot.SendTextMessageAsync(Message.Chat.Id, "Уже загружаю....");
-                            await bot.SendDocumentAsync(Message.Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(fs, fileName));
-                            break;
-                        }
-                    case "Video":
-                        {
-                            Console.WriteLine($"Отправлен файл {fileName}");
-                            await bot.SendTextMessageAsync(Message.Chat.Id, "Уже загружаю....");
-                            await bot.SendVideoAsync(Message.Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(fs, fileName));
-                            break;
-                        }
-                    case "Audio":
-                        {
-                            Console.WriteLine($"Отправлен файл {fileName}");
-                            await bot.SendTextMessageAsync(Message.Chat.Id, "Уже загружаю....");
-                            await bot.SendAudioAsync(Message.Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(fs, fileName));
-                            break;
-                        }
-                    case "Photo":
-                        {
-                            Console.WriteLine($"Отправлен файл {fileName}");
-                            await bot.SendTextMessageAsync(Message.Chat.Id, "Уже загружаю....");
-                            await bot.SendPhotoAsync(Message.Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(fs, fileName));
-                            break;
-                        }
-                }
-            }
-
-        }
+        #endregion
 
         [Obsolete]
         public MainWindow()
         {
             InitializeComponent();
+            string tokenBot = default;
+            window = this;
+
+            // показ диалогового окна для ввода токена бота
+            if (MessageBox.Show("У Вас есть Token бота?", "Уведомление", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                OpenFileDialog dialog = new OpenFileDialog();
+                dialog.Title = "Выбор файла Token";
+                dialog.Filter = "Файлы(*.txt)|*.txt";
+                dialog.ShowDialog();
+                string tokenBotPath = dialog.FileName;
+                tokenBot = System.IO.File.ReadAllText(tokenBotPath);
+            }
+            else System.Environment.Exit(0); // заврешение программы при отказе ввода токена
             
 
-            window = this;
-            string tokenBot = System.IO.File.ReadAllText(@"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\Token_BOT.txt");
-            string dFlowKeyPath = @"C:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\WPF_Telegram_Bot\iksbot-9tan-8bfc6cdbd2be.json";
-            //string tokenBot = System.IO.File.ReadAllText(@"D:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\Token_BOT.txt");
-            //string dFlowKeyPath = @"D:\Dropbox\IKS\C# проекты\C# Учеба\ДЗ 10\WPF_Telegram_Bot\iksbot-9tan-8bfc6cdbd2be.json";
-            
+            string dFlowKeyPath = @"iksbot-9tan-8bfc6cdbd2be.json";
+
             if (!Directory.Exists(Path))
                 Directory.CreateDirectory(Path);
 
@@ -154,6 +105,7 @@ namespace WPF_Telegram_Bot
             #endregion
 
             //Без данной строки Бот не инициируется на сервере
+
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
 
@@ -163,7 +115,7 @@ namespace WPF_Telegram_Bot
             byte fromIndex = 6;
             //данная позиция нужна для метода Substring
             byte numberOfSymbol = 1;
-
+            
             foreach (var letters in constParse)
             {
                 List<Constellation> constellations = new List<Constellation>();
@@ -185,11 +137,11 @@ namespace WPF_Telegram_Bot
             bot.OnCallbackQuery += BotOnCallbackQuery;
             bot.StartReceiving();
             var iAm = bot.GetMeAsync().Result;
-            ListBoxUserList = new ObservableCollection<UserLog>();
-            ListBoxUsersBotLogsCmd = new ObservableCollection<UserLog>();
-            Choise.ItemsSource = ListBoxUserList;
-            CMD.ItemsSource = ListBoxUsersBotLogsCmd;
-            UsersList.ItemsSource = ListBoxUserList;
+            UserListListBox = new ObservableCollection<UserLog>();
+            UsersBotCmdListBox = new ObservableCollection<UserLog>();
+            Choise.ItemsSource = UserListListBox;
+            CMD.ItemsSource = UsersBotCmdListBox;
+            UsersList.ItemsSource = UserListListBox;
         }
 
         [Obsolete]
@@ -206,7 +158,7 @@ namespace WPF_Telegram_Bot
                 string fileName = RequestFiles.FileListName[indexFileName].ToString();
 
                 SendFiles(Path + $@"\{Message.From.FirstName}_{Message.Chat.Id}\{type}\{fileName}", $"{fileName}", type);
-                DataToMainWindow(ListBoxUsersBotLogsCmd, $"Отправлен файл {fileName}");
+                DataToMainWindow(UsersBotCmdListBox, $"Отправлен файл {fileName}");
                 return;
             }
             //во второе условие приходят данные для дальнейшего поиска нужных типов сохраненных файлов
@@ -240,7 +192,7 @@ namespace WPF_Telegram_Bot
                                 await bot.SendPhotoAsync(Message.From.Id, item.UrlMap);
                                 await bot.SendPhotoAsync(Message.From.Id, item.UrlPhoto);
                                 await bot.SendTextMessageAsync(Message.From.Id, item.Text);
-                                DataToMainWindow(ListBoxUsersBotLogsCmd, $"Созвездие {item.Name}");
+                                DataToMainWindow(UsersBotCmdListBox, $"Созвездие {item.Name}");
                             }
                         }
                     }
@@ -261,7 +213,7 @@ namespace WPF_Telegram_Bot
             // передача в основной поток, как работает не знаю, смотрите ДЗ 10.4 на 7 минуте, там ничего не сказано 
             window.Dispatcher.Invoke(() =>
             {
-                ListBoxUsersBotLogsCmd.Add(new UserLog(Message.Chat.Id, firstName, Message.Text, Message.Date));
+                UsersBotCmdListBox.Add(new UserLog(Message.Chat.Id, firstName, Message.Text, Message.Date));
             });
 
 
@@ -276,11 +228,11 @@ namespace WPF_Telegram_Bot
                 Directory.CreateDirectory(Path + $@"\{firstName}_{Message.Chat.Id}\Logs");
             }
 
-            if(ListBoxUserList.All(user => user.Id != tempUser.Id))
+            if(UserListListBox.All(user => user.Id != tempUser.Id))
             {
                 window.Dispatcher.Invoke(() =>
                 {
-                    ListBoxUserList.Add(new UserLog(Message.Chat.Id, firstName));
+                    UserListListBox.Add(new UserLog(Message.Chat.Id, firstName));
                 });
             }
 
@@ -407,32 +359,103 @@ namespace WPF_Telegram_Bot
             {
                 case MessageType.Photo:
                     //Console.WriteLine("Получено фото ");
-                    DataToMainWindow(ListBoxUsersBotLogsCmd, "Получено фото ");
+                    DataToMainWindow(UsersBotCmdListBox, "Получено фото ");
                     string photoFileId = Message.Photo[Message.Photo.Length - 1].FileId;
                     Download(photoFileId, Path + $@"\{firstName}_{Message.Chat.Id}\Photo\" + (Message.Photo[Message.Photo.Length - 1]).FileUniqueId + ".jpg");
                     await bot.SendTextMessageAsync(Message.From.Id, "я сохранил это");
                     break;
                 case MessageType.Document:
                     //Console.WriteLine("Получен документ " + Message.Document.FileName);
-                    DataToMainWindow(ListBoxUsersBotLogsCmd, "Получен документ " + Message.Document.FileName);
+                    DataToMainWindow(UsersBotCmdListBox, "Получен документ " + Message.Document.FileName);
                    Download(e.Message.Document.FileId, Path + $@"\{firstName}_{Message.Chat.Id}\Document\" + Message.Document.FileName);
                     await bot.SendTextMessageAsync(Message.From.Id, "я сохранил это");
                     break;
                 case MessageType.Video:
                     //Console.WriteLine("Получен видео файл " + Message.Video.FileName);
-                    DataToMainWindow(ListBoxUsersBotLogsCmd, "Получен видео файл " + Message.Video.FileName);
+                    DataToMainWindow(UsersBotCmdListBox, "Получен видео файл " + Message.Video.FileName);
                     Download(Message.Video.FileId, Path + $@"\{firstName}_{Message.Chat.Id}\Video\" + Message.Video.FileName);
                     await bot.SendTextMessageAsync(Message.From.Id, "я сохранил это");
                     break;
                 case MessageType.Audio:
                     //Console.WriteLine("Получен аудио файл " + Message.Audio.FileName);
-                    DataToMainWindow(ListBoxUsersBotLogsCmd, "Получен аудио файл " + Message.Audio.FileName);
+                    DataToMainWindow(UsersBotCmdListBox, "Получен аудио файл " + Message.Audio.FileName);
                     Download(Message.Audio.FileId, Path + $@"\{firstName}_{Message.Chat.Id}\Audio\" + Message.Audio.FileName);
                     await bot.SendTextMessageAsync(Message.From.Id, "я сохранил это");
                     break;
             }
 
         }
+
+        #region Методы
+
+        /// <summary>
+        /// Скачивание файлов
+        /// </summary>
+        /// <param name="fileId">ID файла отправленное с сервера Telegram</param>
+        /// <param name="path">путь куда сохраняется файл</param>
+        private static async void Download(string fileId, string path)
+        {
+            var file = await bot.GetFileAsync(fileId);
+            try
+            {
+                using (FileStream stream = new FileStream(path, FileMode.Create))
+                {
+                    await bot.DownloadFileAsync(file.FilePath, stream);
+                }
+            }
+            catch (Exception)
+            {
+
+                return;
+            }
+        }
+
+        /// <summary>
+        /// Отправка файла обратно пользователю
+        /// </summary>
+        /// <param name="path">Путь где лежит файл</param>
+        /// <param name="fileName">имя файла</param>
+        /// <param name="messageType">Тип документа (Document, Video, etc..)</param>
+        private static async void SendFiles(string path, string fileName, string messageType)
+        {
+
+            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+            {
+                switch (messageType)
+                {
+                    case ("Document"):
+                        {
+                            Console.WriteLine($"Отправлен файл {fileName}");
+                            await bot.SendTextMessageAsync(Message.Chat.Id, "Уже загружаю....");
+                            await bot.SendDocumentAsync(Message.Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(fs, fileName));
+                            break;
+                        }
+                    case "Video":
+                        {
+                            Console.WriteLine($"Отправлен файл {fileName}");
+                            await bot.SendTextMessageAsync(Message.Chat.Id, "Уже загружаю....");
+                            await bot.SendVideoAsync(Message.Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(fs, fileName));
+                            break;
+                        }
+                    case "Audio":
+                        {
+                            Console.WriteLine($"Отправлен файл {fileName}");
+                            await bot.SendTextMessageAsync(Message.Chat.Id, "Уже загружаю....");
+                            await bot.SendAudioAsync(Message.Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(fs, fileName));
+                            break;
+                        }
+                    case "Photo":
+                        {
+                            Console.WriteLine($"Отправлен файл {fileName}");
+                            await bot.SendTextMessageAsync(Message.Chat.Id, "Уже загружаю....");
+                            await bot.SendPhotoAsync(Message.Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(fs, fileName));
+                            break;
+                        }
+                }
+            }
+
+        }
+
         /// <summary>
         /// открытие в explorer соотвествующей папки пользователя
         /// </summary>
@@ -519,8 +542,8 @@ namespace WPF_Telegram_Bot
         private void SendText(string messageText)
         {
             var botData = bot.GetMeAsync().Result;
-            ListBoxUsersBotLogsCmd.Add(new UserLog(botData.Id, "Admin", messageText));
-            CMD.ItemsSource = ListBoxUsersBotLogsCmd;
+            UsersBotCmdListBox.Add(new UserLog(botData.Id, $"Admin -> {Message.From.Id} {Message.From.FirstName}:", messageText));
+            CMD.ItemsSource = UsersBotCmdListBox;
         }
 
         /// <summary>
@@ -531,22 +554,23 @@ namespace WPF_Telegram_Bot
         private void SaveLog_Click(object sender, RoutedEventArgs e)
         {
             // путь к папке Log текущего пользователя
-            string pathForLog = Path + $@"\{Message.From.FirstName}_{Message.Chat.Id}\Logs\log_{DateTime.Now.ToShortDateString()}.json";
             if (String.IsNullOrEmpty(Choise.Text))
             {
                 MessageBox.Show("Укажите пользователя", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+            string pathForLog = Path + $@"\{Message.From.FirstName}_{Message.Chat.Id}\Logs\log_{DateTime.Now.ToShortDateString()}.json";
             
             SerializerLog SerializeUserMessages = new SerializerLog();
             if (!File.Exists(pathForLog))
-                File.WriteAllText(pathForLog, SerializeUserMessages.Serialize(ListBoxUsersBotLogsCmd
+                File.WriteAllText(pathForLog, SerializeUserMessages.Serialize(UsersBotCmdListBox
                                                                               ,Message.Chat.Id
                                                                               ,Message.From.FirstName));
             // дозапись последних сообщений в Log пользователя за текущую дату
-            else File.AppendAllText(pathForLog, SerializeUserMessages.Serialize(ListBoxUsersBotLogsCmd
+            else File.AppendAllText(pathForLog, SerializeUserMessages.Serialize(UsersBotCmdListBox
                                                                                ,Message.Chat.Id
                                                                                ,File.GetLastWriteTime(pathForLog)));
+            MessageBox.Show($"Сообщения пользователя {Message.From.FirstName} сохранены", "Уведомление", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         
         /// <summary>
@@ -556,19 +580,26 @@ namespace WPF_Telegram_Bot
         /// <param name="e"></param>
         private void SaveAllLog_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var user in ListBoxUserList)
+                if (UserListListBox.Count == 0)
+                {
+                    MessageBox.Show("Нет подключенных пользователей", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+            foreach (var user in UserListListBox)
             {
                 string pathForLog = Path + $@"\{Message.From.FirstName}_{Message.Chat.Id}\Logs\log_{DateTime.Now.ToShortDateString()}.json";
                 SerializerLog SerializeUserMessages = new SerializerLog();
                 if (!File.Exists(pathForLog))
-                    File.WriteAllText(pathForLog, SerializeUserMessages.Serialize(ListBoxUsersBotLogsCmd
+                    File.WriteAllText(pathForLog, SerializeUserMessages.Serialize(UsersBotCmdListBox
                                                                                   , Message.Chat.Id
                                                                                   , Message.From.FirstName));
                 // дозапись последних сообщений в Log пользователя за текущую дату
-                else File.AppendAllText(pathForLog, SerializeUserMessages.Serialize(ListBoxUsersBotLogsCmd
+                else File.AppendAllText(pathForLog, SerializeUserMessages.Serialize(UsersBotCmdListBox
                                                                                    , Message.Chat.Id
                                                                                    , File.GetLastWriteTime(pathForLog)));
+                MessageBox.Show($"Сообщения всех пользователей сохранены", "Уведомление", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
+        #endregion
     }
 }
