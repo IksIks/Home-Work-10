@@ -1,24 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-//using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-//using System.Windows.Media.Imaging;
-//using System.Windows.Navigation;
-//using System.Windows.Shapes;
 using Google.Cloud.Dialogflow.V2;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-//using System;
-//using System.Collections.Generic;
 using System.IO;
-//using System.Linq;
 using System.Net;
 using Telegram.Bot;
 using Telegram.Bot.Args;
@@ -49,7 +37,7 @@ namespace WPF_Telegram_Bot
         // свойство для передачи в ListBox "UserList"
         private static ObservableCollection<UserLog> UserListListBox { get; set; }
         // свойство для записи логов всех подключаемых пользователей и передачи в ListBox "CMD"
-        private static ObservableCollection<UserLog> UsersBotCmdListBox { get; set; }
+        public static ObservableCollection<UserLog> UsersBotCmdListBox { get; set; }
 
         //переменная для возможности передачи в основной поток
         private static MainWindow window { get; set; }
@@ -84,32 +72,46 @@ namespace WPF_Telegram_Bot
                 dialog.Title = "Выбор файла Token";
                 dialog.Filter = "Файлы(*.txt)|*.txt";
                 dialog.ShowDialog();
-                string tokenBotPath = dialog.FileName;
-                tokenBot = System.IO.File.ReadAllText(tokenBotPath);
+                tokenBot = System.IO.File.ReadAllText(dialog.FileName) ?? String.Empty;
             }
             else System.Environment.Exit(0); // заврешение программы при отказе ввода токена
-            
 
-            string dFlowKeyPath = @"iksbot-9tan-8bfc6cdbd2be.json";
-
-            if (!Directory.Exists(Path))
-                Directory.CreateDirectory(Path);
-
-            #region BotAnswerInitiation
             bot = new TelegramBotClient(tokenBot);
+
+            // проверка на валидность токена, если не прошла - программа ловит исключение и закрывается
+            try
+            {
+                var iAm = bot.GetMeAsync().Result;
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("TOKEN_ERROR, sory", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Environment.Exit(0);
+            }
+            
+            bot.OnMessage += BotOnMessage;
+            bot.OnCallbackQuery += BotOnCallbackQuery;
+            bot.StartReceiving();
+
+            string dFlowKeyPath = @"jsonFiles\iksbot-9tan-8bfc6cdbd2be.json";
+            #region BotAnswerInitiation
+
             var dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(System.IO.File.ReadAllText(dFlowKeyPath));
             projectID = dic["project_id"];
             sessionID = dic["private_key_id"];
             var dialogFlowBilder = new SessionsClientBuilder { CredentialsPath = dFlowKeyPath };
             dFlowClient = dialogFlowBilder.Build();
+
             #endregion
+            if (!Directory.Exists(Path))
+                Directory.CreateDirectory(Path);
 
             //Без данной строки Бот не инициируется на сервере
 
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
 
-            string jsonFile = System.IO.File.ReadAllText("Constellations.json");
+            string jsonFile = System.IO.File.ReadAllText("jsonFiles\\Constellations.json");
             var constParse = JObject.Parse(jsonFile)["Созвездия"].ToArray();
             //данная позиция нужна для метода Substring
             byte fromIndex = 6;
@@ -133,10 +135,7 @@ namespace WPF_Telegram_Bot
                 LettersConstellations.AlphabetConstellations.Add(temp2);
             }
             
-            bot.OnMessage += BotOnMessage;
-            bot.OnCallbackQuery += BotOnCallbackQuery;
-            bot.StartReceiving();
-            var iAm = bot.GetMeAsync().Result;
+           
             UserListListBox = new ObservableCollection<UserLog>();
             UsersBotCmdListBox = new ObservableCollection<UserLog>();
             Choise.ItemsSource = UserListListBox;
